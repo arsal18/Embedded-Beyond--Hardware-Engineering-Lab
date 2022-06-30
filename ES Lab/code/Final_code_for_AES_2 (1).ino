@@ -4,7 +4,7 @@
 #include "arduino_secrets.h"
 
  
-// Here the respective input pin can be declared
+// Here the respective input pin is declared
 #define DHTPIN 2     
  
 // The sensor is initialized
@@ -77,7 +77,8 @@ void loop() {
 
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval) {
+
+ if (currentMillis - previousMillis >= interval) {
     // save the last time a message was sent
     previousMillis = currentMillis;
   // Two seconds pause between measurements
@@ -116,16 +117,26 @@ void loop() {
   // set the message receive callback
    mqttClient.onMessage(onMqttMessage);
 
-
   } 
 
 
 
-void onMqttMessage(int messageSize); 
+  
+  // call poll() regularly to allow the library to send MQTT keep alive which
+  // avoids being disconnected by the broker
+  mqttClient.poll();
+}
+
+
+
+void onMqttMessage(int messageSize) {
   // we received a message, print out the topic and contents
  Serial.println("Received a message with topic '");
   Serial.print(mqttClient.messageTopic());
-
+Serial.println(); 
+Serial.print("', length ");
+  Serial.print(messageSize);
+  Serial.println(" bytes:");
 
   while (mqttClient.available()) {
      temp = (char)mqttClient.read(); 
